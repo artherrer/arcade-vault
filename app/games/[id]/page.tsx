@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { GameDetailSkeleton } from "@/components/game-detail-skeleton";
 import { Leaderboard } from "@/components/leaderboard";
 import { GAMES, getGame, seededScores } from "@/lib/games";
 
@@ -7,7 +9,17 @@ export function generateStaticParams() {
   return GAMES.map((g) => ({ id: g.id }));
 }
 
-export default async function GameDetailPage({ params }: PageProps<"/games/[id]">) {
+export default function GameDetailPage({ params }: PageProps<"/games/[id]">) {
+  // Leer params es dato de URL: con Cache Components debe ir dentro de <Suspense>
+  // (incluso con generateStaticParams) para que la navegación sea instantánea.
+  return (
+    <Suspense fallback={<GameDetailSkeleton />}>
+      <GameDetail params={params} />
+    </Suspense>
+  );
+}
+
+async function GameDetail({ params }: { params: PageProps<"/games/[id]">["params"] }) {
   const { id } = await params;
   const game = getGame(id);
   if (!game) notFound();

@@ -581,6 +581,33 @@
   .stat-strip .v { font-family: var(--pixel); font-size: 16px; color: var(--cyan); margin-top: 6px; text-shadow: 0 0 6px rgba(0,245,255,0.5); }
   .detail-actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
 
+  /* ===== detail skeleton ===== */
+  .skel-bone { background: var(--bg-3); }
+  .detail-tags .skel-tag { height: 27px; padding: 0; background: var(--bg-2); }
+  .skel-cover {
+    background:
+      repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,245,255,0.035) 3px 4px),
+      var(--bg-2);
+    display: grid; place-items: center;
+  }
+  .skel-cover-label {
+    font-family: var(--pixel); font-size: 10px; letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    animation: blink 1.2s steps(1,end) infinite;
+  }
+  .skel-scan {
+    position: absolute; left: 0; right: 0; top: 0; height: 2px;
+    background: var(--cyan);
+    box-shadow: 0 0 12px 2px rgba(0,245,255,0.55);
+    opacity: 0.7;
+    animation: skel-scan 1.8s linear infinite;
+  }
+  @keyframes skel-scan { from { top: 0; } to { top: 100%; } }
+  @media (prefers-reduced-motion: reduce) {
+    .skel-scan { display: none; }
+    .skel-cover-label { animation: none; }
+  }
+
   .leaderboard {
     border: 1px solid var(--line);
     background: var(--bg-2);
