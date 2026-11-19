@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="sub mb-8">
         ESTE CARTUCHO NO EXISTE EN EL VAULT <span className="blink">_</span>
       </div>
-      <Link href="/" className="btn lg">
+      <Link href="/games" className="btn lg">
         VOLVER AL VAULT
       </Link>
     </section>
