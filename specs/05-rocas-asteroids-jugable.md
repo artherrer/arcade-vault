@@ -1,6 +1,6 @@
 # SPEC 05 — ROCAS jugable: port del Asteroids de referencia dentro del reproductor
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02, SPEC 03, SPEC 04
 > **Fecha:** 2026-11-19
 > **Objetivo:** Convertir `/games/rocas/play` en el Asteroids real, portado a TypeScript desde `references/started-games/02-asteroids/` y conectado al HUD, la pausa y el modal de fin de juego de `GamePlayer`.
