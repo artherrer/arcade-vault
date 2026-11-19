@@ -1,6 +1,6 @@
 # SPEC 04 — Integración base de Supabase y autenticación con email y contraseña
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-11-19
 > **Objetivo:** Conectar la app a Supabase y convertir `/login` en un registro e inicio de sesión reales con email y contraseña, con un perfil público (`profiles.username`) y la sesión visible en la nav.
