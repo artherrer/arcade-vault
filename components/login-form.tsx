@@ -11,10 +11,10 @@ export function LoginForm() {
   const [pass, setPass] = useState("");
   const [email, setEmail] = useState("");
 
-  const goHome = () => router.push("/");
+  const goToGames = () => router.push("/games");
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    goHome();
+    goToGames();
   };
 
   return (
@@ -67,7 +67,7 @@ export function LoginForm() {
         </button>
       </form>
 
-      <button type="button" className="btn ghost mt-2.5 w-full" onClick={goHome}>
+      <button type="button" className="btn ghost mt-2.5 w-full" onClick={goToGames}>
         JUGAR COMO INVITADO
       </button>
 
