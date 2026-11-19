@@ -8,6 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Arcade Vault is an online platform for playing games and competing for the highest score. It is currently a fresh `create-next-app` scaffold (only `app/layout.tsx`, `app/page.tsx`, `app/globals.css`); the product is to be built with Spec Driven Design using the `/spec` and `/spec-impl` skills from [Klerith/fernando-skills](https://github.com/Klerith/fernando-skills) (`npx skills@latest add Klerith/fernando-skills`). Follow that spec → implement workflow for new features. The README is written in Spanish.
 
+
+# Skills
+Usa siempre /frontend-design para diseñar la interfaz de usuario.
+
 ## Commands
 
 - `npm run dev` — dev server (Turbopack) at http://localhost:3000
