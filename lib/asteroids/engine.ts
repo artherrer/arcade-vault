@@ -2,24 +2,15 @@
 // Misma física y constantes. Todo el estado vive dentro de cada instancia de
 // createAsteroidsGame; a nivel de módulo solo hay constantes y clases.
 
+import type { GameStats } from "@/lib/game-types";
+import type { ScoreSubmission } from "@/lib/scoring";
+
 export type AsteroidsPhase = "ready" | "playing" | "dead" | "gameover";
 
-export type AsteroidsStats = {
-  score: number;
-  lives: number; // 3 → 0
-  level: number; // empieza en 1
-};
-
-export type AsteroidsResult = {
-  score: number;
-  level: number;
-  durationMs: number; // tiempo jugado (playing + dead), sin ready ni pausa; entero
-};
-
 export type AsteroidsCallbacks = {
-  onStats: (stats: AsteroidsStats) => void; // se llama solo cuando cambia algún valor
+  onStats: (stats: GameStats) => void; // { score, lives 3 → 0, level desde 1 }, solo si cambia
   onPhase: (phase: AsteroidsPhase) => void; // ready → playing ⇄ dead → gameover
-  onGameOver: (result: AsteroidsResult) => void; // una vez por partida: vidas a 0 o end()
+  onGameOver: (result: ScoreSubmission) => void; // una vez por partida: vidas a 0 o end(); durationMs = playing + dead, sin ready ni pausa
 };
 
 export type AsteroidsGame = {
@@ -390,7 +381,7 @@ export function createAsteroidsGame(
   let ended = false;
   let lastTime: number | null = null;
   let rafId = 0;
-  let emitted: AsteroidsStats = { score, lives, level };
+  let emitted: GameStats = { score, lives, level };
 
   // ── Input ──
   const acceptsInput = () => !paused && !ended && phase !== "gameover";

@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { saveScore, type SaveScoreErrorCode } from "@/app/games/actions";
-import { AsteroidsCanvas } from "@/components/asteroids-canvas";
-import type { AsteroidsResult, AsteroidsStats } from "@/lib/asteroids/engine";
+import { ARENAS } from "@/components/arenas";
+import type { GameStats } from "@/lib/game-types";
 import type { Game } from "@/lib/games";
+import type { ScoreSubmission } from "@/lib/scoring";
 
-// ROCAS es el único juego real (SPEC 05). El resto sigue con la simulación visual:
-// la puntuación sube sola.
+// Los juegos con entrada en ARENAS son reales (SPEC 05, 07). El resto sigue con la
+// simulación visual: la puntuación sube sola.
 const TICK_MS = 220;
-const INITIAL: AsteroidsStats = { score: 0, lives: 3, level: 1 };
+const SIMULATED_INITIAL: GameStats = { score: 0, lives: 3, level: 1 };
 
 function isTextField(target: EventTarget | null) {
   return target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
@@ -36,7 +37,9 @@ type GamePlayerProps = {
 
 export function GamePlayer({ game, username, connected }: GamePlayerProps) {
   const player = username ? username.toUpperCase() : "INVITADO";
-  const [progress, setProgress] = useState(INITIAL);
+  const arena = ARENAS[game.id];
+  const initial = arena?.initial ?? SIMULATED_INITIAL;
+  const [progress, setProgress] = useState(initial);
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
   // Iniciales del modal de los juegos no conectados: solo visuales.
@@ -46,23 +49,23 @@ export function GamePlayer({ game, username, connected }: GamePlayerProps) {
   // Guarda contra el doble guardado: run de la última partida enviada y
   // resultado para REINTENTAR. Se usan refs, no un useEffect.
   const submittedRunRef = useRef<number | null>(null);
-  const resultRef = useRef<AsteroidsResult | null>(null);
+  const resultRef = useRef<ScoreSubmission | null>(null);
   const runRef = useRef(0);
-  // Cambiar la key remonta AsteroidsCanvas: partida nueva en fase "ready".
+  // Cambiar la key remonta la arena: partida nueva en fase "ready".
   const [run, setRun] = useState(0);
   const { score, lives, level } = progress;
-  const isRocas = game.id === "rocas";
+  const simulated = !arena;
 
   useEffect(() => {
-    if (isRocas || over || paused) return;
+    if (!simulated || over || paused) return;
     const t = setInterval(() => {
       setProgress((p) => {
         const next = p.score + Math.floor(10 + Math.random() * 90);
-        return { ...p, score: next, level: next % 2500 < 100 ? p.level + 1 : p.level };
+        return { ...p, score: next, level: p.level !== null && next % 2500 < 100 ? p.level + 1 : p.level };
       });
     }, TICK_MS);
     return () => clearInterval(t);
-  }, [isRocas, over, paused]);
+  }, [simulated, over, paused]);
 
   // P / Escape = botón PAUSA. Sin efecto con el modal abierto o escribiendo en un campo.
   useEffect(() => {
@@ -85,7 +88,7 @@ export function GamePlayer({ game, username, connected }: GamePlayerProps) {
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [over]);
 
-  const submit = async (result: AsteroidsResult) => {
+  const submit = async (result: ScoreSubmission) => {
     const forRun = runRef.current;
     setSave({ status: "saving" });
     let next: SaveState;
@@ -100,7 +103,7 @@ export function GamePlayer({ game, username, connected }: GamePlayerProps) {
     if (runRef.current === forRun) setSave(next);
   };
 
-  const endGame = (result: AsteroidsResult) => {
+  const endGame = (result: ScoreSubmission) => {
     setProgress((p) => ({ ...p, score: result.score, level: result.level }));
     setOver(true);
     // Guardado automático: una sola vez por partida, con sesión y con puntos.
@@ -118,7 +121,7 @@ export function GamePlayer({ game, username, connected }: GamePlayerProps) {
   const restart = () => {
     runRef.current += 1;
     resultRef.current = null;
-    setProgress(INITIAL);
+    setProgress(initial);
     setPaused(false);
     setOver(false);
     setSaved(false);
@@ -140,11 +143,11 @@ export function GamePlayer({ game, username, connected }: GamePlayerProps) {
           </div>
           <div className="hud-stat lives">
             <div className="l">Vidas</div>
-            <div className="v">{"♥ ".repeat(lives).trim() || "—"}</div>
+            <div className="v">{lives === null ? "—" : "♥ ".repeat(lives).trim() || "—"}</div>
           </div>
           <div className="hud-stat level">
             <div className="l">Nivel</div>
-            <div className="v">{String(level).padStart(2, "0")}</div>
+            <div className="v">{level === null ? "—" : String(level).padStart(2, "0")}</div>
           </div>
         </div>
         <div className="hud-actions">
@@ -162,8 +165,8 @@ export function GamePlayer({ game, username, connected }: GamePlayerProps) {
 
       <div className="crt">
         <div className="crt-screen">
-          {isRocas ? (
-            <AsteroidsCanvas key={run} paused={paused} over={over} onStats={setProgress} onGameOver={endGame} />
+          {arena ? (
+            <arena.Arena key={run} paused={paused} over={over} onStats={setProgress} onGameOver={endGame} />
           ) : (
             <div className="game-arena" aria-hidden="true">
               <div className="grid-floor"></div>

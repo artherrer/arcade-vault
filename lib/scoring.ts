@@ -19,6 +19,19 @@ export const SCORE_RULES: Record<string, ScoreRule> = {
     score % 10 === 0 &&
     score <= (durationMs / 1000) * 1500 &&
     level <= 1 + Math.floor(score / 2080),
+  // APILA: granularidad 1 (la caída suave suma 1).
+  // Cota mínima: el nivel N exige ≥ 10·(N−1) líneas de ≥ 100 puntos → level ≤ 1 + floor(score/1000).
+  // Cota máxima: con L = 10·level − 1 líneas como mucho:
+  //   líneas ≤ 200·level cada una (una tetrada son 800·level entre 4 líneas, y el nivel nunca baja);
+  //   caídas ≤ 38 por pieza (19 filas × 2), con piezas ≤ (10L + 200)/4 + 1 (≥ 4 celdas por pieza,
+  //   tablero de 200 celdas, más la pieza que está cayendo) → ≤ 95L + 1938.
+  //   score ≤ L·(200·level + 95) + 1938. Nivel 1 → 4.593.
+  // Sin límite de puntos/s: la caída instantánea no tiene tope físico de velocidad.
+  apila: ({ score, level }) => {
+    if (level === null || level > 1 + Math.floor(score / 1000)) return false;
+    const lines = 10 * level - 1;
+    return score <= lines * (200 * level + 95) + 1938;
+  },
 };
 
 export function isConnected(gameId: string): boolean {

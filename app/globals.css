@@ -1371,24 +1371,32 @@
     }
   }
 
-  /* ===== ROCAS (Asteroids real, SPEC 05) ===== */
+  /* ===== Arenas reales: ROCAS (SPEC 05) y APILA (SPEC 07) ===== */
   /* El escenario llena .crt-screen (ya 4:3). Las scanlines de ::after quedan encima por
-     orden de pintado; la viñeta de ::before se sube solo en este juego para que no la tape
-     el canvas opaco. */
-  .crt-screen:has(.asteroids-stage)::before {
+     orden de pintado; la viñeta de ::before se sube solo en estos juegos para que no la
+     tape el canvas opaco. */
+  .crt-screen:has(.asteroids-stage, .apila-stage)::before {
     z-index: 1;
   }
-  .asteroids-stage {
+  .asteroids-stage,
+  .apila-stage {
     position: absolute;
     inset: 0;
     container-type: inline-size;
   }
-  .asteroids-canvas {
+  .asteroids-canvas,
+  .apila-canvas {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .asteroids-ready {
+  /* El motor de APILA dibuja SIGUIENTE / LÍNEAS con la fuente computada del canvas. */
+  .apila-canvas {
+    font-family: var(--pixel);
+  }
+
+  /* Overlay de inicio común (ReadyOverlay, SPEC 07). Usa cqi del escenario de cada juego. */
+  .ready-overlay {
     position: absolute;
     inset: 0;
     z-index: 2;
@@ -1406,7 +1414,7 @@
     text-align: center;
     pointer-events: none;
   }
-  .asteroids-cta {
+  .ready-cta {
     font-family: var(--pixel);
     font-size: clamp(10px, 2.6cqi, 22px);
     line-height: 1.5;
@@ -1416,25 +1424,25 @@
       0 0 18px rgba(245, 255, 0, 0.35);
     animation: blink 1.2s steps(1, end) infinite;
   }
-  .asteroids-keys {
+  .ready-keys {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: repeat(var(--ready-cols, 4), auto);
     gap: clamp(8px, 2cqi, 16px) clamp(14px, 4cqi, 36px);
   }
-  .asteroids-keys li {
+  .ready-keys li {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: clamp(6px, 1.4cqi, 10px);
   }
-  .asteroids-caps {
+  .ready-caps {
     display: flex;
     gap: 5px;
   }
-  .asteroids-caps kbd {
+  .ready-caps kbd {
     min-width: clamp(20px, 4.2cqi, 34px);
     padding: clamp(4px, 0.9cqi, 7px) clamp(5px, 1cqi, 8px);
     font-family: var(--pixel);
@@ -1446,13 +1454,13 @@
     background: rgba(0, 245, 255, 0.06);
     box-shadow: 0 0 8px rgba(0, 245, 255, 0.2);
   }
-  .asteroids-action {
+  .ready-action {
     font-family: var(--mono);
     font-size: clamp(9px, 1.5cqi, 12px);
     letter-spacing: 0.16em;
     color: var(--ink-dim);
   }
-  .asteroids-touch {
+  .ready-touch {
     display: none;
     font-family: var(--pixel);
     font-size: clamp(8px, 1.6cqi, 12px);
@@ -1461,17 +1469,17 @@
     text-shadow: 0 0 8px rgba(255, 0, 110, 0.6);
   }
   @media (hover: none) and (pointer: coarse) {
-    .asteroids-touch {
+    .ready-touch {
       display: block;
     }
   }
   @container (max-width: 480px) {
-    .asteroids-keys {
+    .ready-keys {
       grid-template-columns: repeat(2, auto);
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .asteroids-cta {
+    .ready-cta {
       animation: none;
     }
   }
