@@ -1,6 +1,6 @@
 # SPEC 09 — SERPENTINA jugable: Snake clásico conectado al leaderboard
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 05, SPEC 06, SPEC 07
 > **Fecha:** 2026-11-23
 > **Objetivo:** Convertir `/games/serpentina/play` en un Snake clásico, escrito en TypeScript dentro de `GamePlayer`, con las frutas de `references/resources/snake-assets/` y guardando sus puntuaciones en Supabase.

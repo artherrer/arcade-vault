@@ -50,6 +50,18 @@ export const SCORE_RULES: Record<string, ScoreRule> = {
     score % 10 === 0 &&
     score >= BLOQUE_BUSTER_CUMULATIVE[level - 1] &&
     score <= BLOQUE_BUSTER_CUMULATIVE[level],
+  // SERPENTINA: 10 puntos por fruta → múltiplo de 10.
+  // El nivel sale solo de las frutas: level = floor(fruits/5) + 1 = floor(score/50) + 1 (igualdad exacta).
+  // Máximo: 768 celdas − 3 segmentos iniciales = 765 frutas → 7650.
+  // Tiempo: una fruta exige un paso, y un paso consume ≥ 60 ms de dt acumulado
+  //   → frutas ≤ sumDt/60. Con durationMs = round(sumDt), sumDt ≤ durationMs + 0,5
+  //   → score ≤ 10 · floor((durationMs + 1) / 60).
+  serpentina: ({ score, level, durationMs }) =>
+    level !== null &&
+    score % 10 === 0 &&
+    score <= 7650 &&
+    level === Math.floor(score / 50) + 1 &&
+    score <= 10 * Math.floor((durationMs + 1) / 60),
 };
 
 export function isConnected(gameId: string): boolean {
