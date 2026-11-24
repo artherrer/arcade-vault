@@ -23,7 +23,7 @@ export const GAMES: Game[] = [
     id: "bloque-buster",
     title: "BLOQUE BUSTER",
     short: "Rebota la pelota y destruye muros de neón.",
-    long: "Pilota una nave-paleta y rebota un núcleo de plasma para pulverizar muros de bloques cromáticos. Cada nivel reorganiza la grilla en patrones imposibles. ¿Hasta dónde llegará tu racha?",
+    long: "Pilota una nave-paleta y rebota un núcleo de plasma para pulverizar muros de bloques cromáticos. Cinco niveles, cinco patrones, y la pelota acelera en cada uno. ¿Llegarás a limpiar el último muro?",
     cat: "ARCADE",
     cover: "cover-bricks",
     color: "cyan",

@@ -11,6 +11,10 @@ export type ScoreSubmission = {
 // true si la partida es plausible para ese juego.
 export type ScoreRule = (s: ScoreSubmission) => boolean;
 
+// BLOQUE BUSTER: puntos acumulados al completar cada nivel (60/40/30/39/39 bloques × 10).
+// Constante local: no se importa del motor, que depende del DOM y esto corre en el servidor.
+const BLOQUE_BUSTER_CUMULATIVE = [0, 600, 1000, 1300, 1690, 2080];
+
 export const SCORE_RULES: Record<string, ScoreRule> = {
   // ROCAS: puntos 20/50/100 → múltiplo de 10; máx. 1500 pts/s (disparo triple:
   // 3 balas × 100 cada 0,2 s); superar un nivel exige ≥ 2080 puntos (4 grandes × 520).
@@ -32,6 +36,20 @@ export const SCORE_RULES: Record<string, ScoreRule> = {
     const lines = 10 * level - 1;
     return score <= lines * (200 * level + 95) + 1938;
   },
+  // BLOQUE BUSTER: 10 puntos por bloque → múltiplo de 10.
+  // Bloques por nivel 60/40/30/39/39 → acumulado al completar cada nivel:
+  //   C = [0, 600, 1000, 1300, 1690, 2080].
+  // Para estar en el nivel N hay que haber completado los anteriores (≥ C[N−1]), y en el nivel N
+  // no se pueden romper más bloques que los suyos (≤ C[N]). Al completar el 5 la partida acaba con level 5.
+  // Sin límite de puntos/s: el total está acotado a 2080.
+  "bloque-buster": ({ score, level }) =>
+    level !== null &&
+    Number.isInteger(level) &&
+    level >= 1 &&
+    level <= 5 &&
+    score % 10 === 0 &&
+    score >= BLOQUE_BUSTER_CUMULATIVE[level - 1] &&
+    score <= BLOQUE_BUSTER_CUMULATIVE[level],
 };
 
 export function isConnected(gameId: string): boolean {
