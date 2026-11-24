@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { CATEGORIES, GAMES, type CategoryFilter } from "@/lib/games";
 import { GameCard } from "@/components/game-card";
+import { isConnected } from "@/lib/scoring";
 
-export function Library() {
+// bests: mejores puntuaciones reales de los juegos conectados (SPEC 06).
+// Sin bests (fallback del Suspense), las tarjetas conectadas muestran "—".
+export function Library({ bests }: { bests?: Record<string, number> }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<CategoryFilter>("TODOS");
 
@@ -40,7 +43,11 @@ export function Library() {
 
       <div className="av-grid">
         {filtered.map((g) => (
-          <GameCard key={g.id} game={g} />
+          <GameCard
+            key={g.id}
+            game={g}
+            best={isConnected(g.id) ? (bests ? (bests[g.id] ?? 0) : null) : g.best}
+          />
         ))}
         {filtered.length === 0 && (
           <div className="col-span-full p-20 text-center text-ink-faint">

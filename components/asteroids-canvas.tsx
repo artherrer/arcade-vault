@@ -1,19 +1,13 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ReadyOverlay } from "@/components/ready-overlay";
 import {
   createAsteroidsGame,
   type AsteroidsGame,
   type AsteroidsPhase,
-  type AsteroidsStats,
 } from "@/lib/asteroids/engine";
-
-type AsteroidsCanvasProps = {
-  paused: boolean;
-  over: boolean;
-  onStats: (stats: AsteroidsStats) => void;
-  onGameOver: (score: number) => void;
-};
+import type { ArenaProps } from "@/lib/game-types";
 
 const CONTROLS: { keys: string[]; action: string }[] = [
   { keys: ["←", "→"], action: "ROTAR" },
@@ -27,7 +21,7 @@ export function AsteroidsCanvas({
   over,
   onStats,
   onGameOver,
-}: AsteroidsCanvasProps) {
+}: ArenaProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<AsteroidsGame | null>(null);
   // Los callbacks van en una ref para no recrear el motor cuando el padre los cambia.
@@ -43,7 +37,7 @@ export function AsteroidsCanvas({
     if (!canvas) return;
     const game = createAsteroidsGame(canvas, {
       onStats: (stats) => callbacksRef.current.onStats(stats),
-      onGameOver: (score) => callbacksRef.current.onGameOver(score),
+      onGameOver: (result) => callbacksRef.current.onGameOver(result),
       onPhase: setPhase,
     });
     gameRef.current = game;
@@ -68,24 +62,7 @@ export function AsteroidsCanvas({
         className="asteroids-canvas"
         aria-label="Campo de asteroides de ROCAS"
       />
-      {phase === "ready" && (
-        <div className="asteroids-ready">
-          <p className="asteroids-cta">PULSA ESPACIO PARA EMPEZAR</p>
-          <ul className="asteroids-keys" aria-label="Controles">
-            {CONTROLS.map(({ keys, action }) => (
-              <li key={action}>
-                <span className="asteroids-caps">
-                  {keys.map((k) => (
-                    <kbd key={k}>{k}</kbd>
-                  ))}
-                </span>
-                <span className="asteroids-action">{action}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="asteroids-touch">NECESITAS UN TECLADO PARA JUGAR</p>
-        </div>
-      )}
+      {phase === "ready" && <ReadyOverlay controls={CONTROLS} />}
     </div>
   );
 }

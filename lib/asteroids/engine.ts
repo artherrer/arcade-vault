@@ -2,23 +2,20 @@
 // Misma física y constantes. Todo el estado vive dentro de cada instancia de
 // createAsteroidsGame; a nivel de módulo solo hay constantes y clases.
 
+import type { GameStats } from "@/lib/game-types";
+import type { ScoreSubmission } from "@/lib/scoring";
+
 export type AsteroidsPhase = "ready" | "playing" | "dead" | "gameover";
 
-export type AsteroidsStats = {
-  score: number;
-  lives: number; // 3 → 0
-  level: number; // empieza en 1
-};
-
 export type AsteroidsCallbacks = {
-  onStats: (stats: AsteroidsStats) => void; // se llama solo cuando cambia algún valor
+  onStats: (stats: GameStats) => void; // { score, lives 3 → 0, level desde 1 }, solo si cambia
   onPhase: (phase: AsteroidsPhase) => void; // ready → playing ⇄ dead → gameover
-  onGameOver: (score: number) => void;
+  onGameOver: (result: ScoreSubmission) => void; // una vez por partida: vidas a 0 o end(); durationMs = playing + dead, sin ready ni pausa
 };
 
 export type AsteroidsGame = {
   setPaused: (paused: boolean) => void;
-  end: () => void; // congela el juego (botón FIN); no llama a onGameOver
+  end: () => void; // congela el juego (botón FIN) y llama a onGameOver si aún no se llamó
   destroy: () => void; // cancela el rAF y quita los listeners de window
 };
 
@@ -376,12 +373,15 @@ export function createAsteroidsGame(
   let deadTimer = 0;
   let powerUpSpawned = false;
   let killsSinceSpawn = 0;
+  // Suma de dt (ya capados) en playing y dead. La pausa no llega a update().
+  let playedSeconds = 0;
+  let reported = false;
 
   let paused = false;
   let ended = false;
   let lastTime: number | null = null;
   let rafId = 0;
-  let emitted: AsteroidsStats = { score, lives, level };
+  let emitted: GameStats = { score, lives, level };
 
   // ── Input ──
   const acceptsInput = () => !paused && !ended && phase !== "gameover";
@@ -424,6 +424,16 @@ export function createAsteroidsGame(
     callbacks.onStats(emitted);
   };
 
+  const reportGameOver = () => {
+    if (reported) return;
+    reported = true;
+    callbacks.onGameOver({
+      score,
+      level,
+      durationMs: Math.round(playedSeconds * 1000),
+    });
+  };
+
   const spawnAsteroids = (count: number) => {
     for (let i = 0; i < count; i++) {
       let x: number, y: number;
@@ -456,7 +466,7 @@ export function createAsteroidsGame(
     lives--;
     if (lives <= 0) {
       setPhase("gameover");
-      callbacks.onGameOver(score);
+      reportGameOver();
     } else {
       deadTimer = DEAD_TIME;
       setPhase("dead");
@@ -469,6 +479,8 @@ export function createAsteroidsGame(
   };
 
   const update = (dt: number) => {
+    if (phase === "playing" || phase === "dead") playedSeconds += dt;
+
     if (phase === "ready") {
       // El campo se mueve, pero la nave no responde y no hay colisiones.
       asteroids.forEach((a) => a.update(dt));
@@ -603,6 +615,7 @@ export function createAsteroidsGame(
     end() {
       ended = true;
       clearKeys();
+      reportGameOver();
     },
     destroy() {
       cancelAnimationFrame(rafId);

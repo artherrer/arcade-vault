@@ -85,7 +85,7 @@ export function Nav({
 
 type NavLinkProps = {
   href: string;
-  /** Activo también en las subrutas (p. ej. /games/caida para /games). */
+  /** Activo también en las subrutas (p. ej. /games/apila para /games). */
   prefix?: boolean;
   onClick?: () => void;
   children: ReactNode;

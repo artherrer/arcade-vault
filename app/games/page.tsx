@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { Library } from "@/components/library";
+import { getBestScores } from "@/lib/scores";
 
 export default function GamesPage() {
   return (
@@ -9,7 +11,15 @@ export default function GamesPage() {
           INSERTA UNA MONEDA PARA JUGAR <span className="blink">_</span>
         </div>
       </section>
-      <Library />
+      {/* Mejores puntuaciones reales: lectura dinámica, dentro de <Suspense>. */}
+      <Suspense fallback={<Library />}>
+        <LibraryWithBests />
+      </Suspense>
     </div>
   );
+}
+
+async function LibraryWithBests() {
+  const bests = await getBestScores();
+  return <Library bests={bests} />;
 }

@@ -3,7 +3,9 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { GameDetailSkeleton } from "@/components/game-detail-skeleton";
 import { Leaderboard } from "@/components/leaderboard";
-import { GAMES, getGame, seededScores } from "@/lib/games";
+import { GAMES, getGame, seededScores, type ScoreRow } from "@/lib/games";
+import { getLeaderboard, getPlays } from "@/lib/scores";
+import { isConnected } from "@/lib/scoring";
 
 export function generateStaticParams() {
   return GAMES.map((g) => ({ id: g.id }));
@@ -24,7 +26,18 @@ async function GameDetail({ params }: { params: PageProps<"/games/[id]">["params
   const game = getGame(id);
   if (!game) notFound();
 
-  const scores = seededScores(id.length * 17 + 3, 10);
+  // Juegos conectados (SPEC 06): ranking, mejor global y partidas reales.
+  let scores: ScoreRow[], best: number, plays: string;
+  if (isConnected(id)) {
+    const [rows, count] = await Promise.all([getLeaderboard(id, 10), getPlays(id)]);
+    scores = rows;
+    best = rows[0]?.score ?? 0;
+    plays = count.toLocaleString("es-ES");
+  } else {
+    scores = seededScores(id.length * 17 + 3, 10);
+    best = game.best;
+    plays = game.plays;
+  }
 
   return (
     <div className="av-detail fade-in">
@@ -44,12 +57,12 @@ async function GameDetail({ params }: { params: PageProps<"/games/[id]">["params
           <div className="stat-strip">
             <div>
               <div className="l">Partidas</div>
-              <div className="v">{game.plays}</div>
+              <div className="v">{plays}</div>
             </div>
             <div>
               <div className="l">Mejor global</div>
               <div className="v text-magenta [text-shadow:0_0_6px_rgba(255,0,110,0.5)]">
-                {game.best.toLocaleString("es-ES")}
+                {best.toLocaleString("es-ES")}
               </div>
             </div>
             <div>
