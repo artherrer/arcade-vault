@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { CATEGORIES, GAMES, type CategoryFilter } from "@/lib/games";
 import { GameCard } from "@/components/game-card";
-import { isConnected } from "@/lib/scoring";
 
 // bests: mejores puntuaciones reales de los juegos conectados (SPEC 06).
 // Sin bests (fallback del Suspense), las tarjetas conectadas muestran "—".
@@ -12,13 +11,19 @@ export function Library({ bests }: { bests?: Record<string, number> }) {
   const [cat, setCat] = useState<CategoryFilter>("TODOS");
 
   const query = q.toLowerCase();
-  const filtered = GAMES.filter((g) => (cat === "TODOS" || g.cat === cat) && g.title.toLowerCase().includes(query));
+  const filtered = GAMES.filter(
+    (g) =>
+      (cat === "TODOS" || g.cat === cat) &&
+      g.title.toLowerCase().includes(query),
+  );
 
   return (
     <>
       <div className="av-filters">
         <div className="av-search">
-          <span className="ico" aria-hidden="true">⌕</span>
+          <span className="ico" aria-hidden="true">
+            ⌕
+          </span>
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -46,12 +51,14 @@ export function Library({ bests }: { bests?: Record<string, number> }) {
           <GameCard
             key={g.id}
             game={g}
-            best={isConnected(g.id) ? (bests ? (bests[g.id] ?? 0) : null) : g.best}
+            best={bests ? (bests[g.id] ?? 0) : null}
           />
         ))}
         {filtered.length === 0 && (
           <div className="col-span-full p-20 text-center text-ink-faint">
-            <div className="pixel mb-3 text-sm text-magenta">NO HAY RESULTADOS</div>
+            <div className="pixel mb-3 text-sm text-magenta">
+              NO HAY RESULTADOS
+            </div>
             <div>Intenta otra búsqueda o categoría.</div>
           </div>
         )}

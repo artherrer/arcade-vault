@@ -1,34 +1,60 @@
 import Link from "next/link";
-import { FeatureIcon, FloatingSilhouettes, type FeatureIconKind } from "@/components/home-art";
+import {
+  FeatureIcon,
+  FloatingSilhouettes,
+  type FeatureIconKind,
+} from "@/components/home-art";
 import { RevealObserver } from "@/components/reveal-observer";
 import { GAMES, type AccentColor } from "@/lib/games";
 
-type Feature = { icon: FeatureIconKind; title: string; desc: string; color: AccentColor };
+type Feature = {
+  icon: FeatureIconKind;
+  title: string;
+  desc: string;
+  color: AccentColor;
+};
 type Stat = { n: string; u: string; s: string };
 type Tick = { p: string; g: string; s: number; t: string; c: AccentColor };
 type TopPlayer = { r: number; p: string; s: number };
 
 const FEATURES: Feature[] = [
-  { icon: "GAMEPAD", title: "JUEGOS CLÁSICOS", desc: "Arkanoid, Tetris, Snake y muchos más. Los mejores arcades de todos los tiempos en un solo lugar.", color: "cyan" },
-  { icon: "FREE", title: "100% GRATIS", desc: "Sin suscripciones, sin pagos ocultos. Todos los juegos disponibles de forma gratuita.", color: "yellow" },
-  { icon: "TROPHY", title: "LADDER BOARDS", desc: "Compite con jugadores de todo el mundo. Escala el ranking y demuestra quién es el mejor.", color: "magenta" },
-  { icon: "ROCKET", title: "SIEMPRE CRECIENDO", desc: "Agregamos nuevos juegos constantemente. Vuelve seguido, siempre habrá algo nuevo que jugar.", color: "green" },
+  {
+    icon: "GAMEPAD",
+    title: "JUEGOS CLÁSICOS",
+    desc: "Arkanoid, Tetris, Snake y muchos más. Los mejores arcades de todos los tiempos en un solo lugar.",
+    color: "cyan",
+  },
+  {
+    icon: "FREE",
+    title: "100% GRATIS",
+    desc: "Sin suscripciones, sin pagos ocultos. Todos los juegos disponibles de forma gratuita.",
+    color: "yellow",
+  },
+  {
+    icon: "TROPHY",
+    title: "LADDER BOARDS",
+    desc: "Compite con jugadores de todo el mundo. Escala el ranking y demuestra quién es el mejor.",
+    color: "magenta",
+  },
+  {
+    icon: "ROCKET",
+    title: "SIEMPRE CRECIENDO",
+    desc: "Agregamos nuevos juegos constantemente. Vuelve seguido, siempre habrá algo nuevo que jugar.",
+    color: "green",
+  },
 ];
 
 const STATS: Stat[] = [
-  { n: "12+", u: "JUEGOS", s: "Y CONTANDO" },
+  { n: String(GAMES.length), u: "JUEGOS", s: "Y CONTANDO" },
   { n: "MILES", u: "DE PARTIDAS", s: "JUGADAS CADA DÍA" },
   { n: "GLOBAL", u: "RANKING", s: "COMPITE CON EL MUNDO" },
 ];
 
 const TICKS: Tick[] = [
-  { p: "NEONFOX", g: "Caída", s: 184220, t: "hace 2 min", c: "magenta" },
-  { p: "PX_KAI", g: "Glotón", s: 96400, t: "hace 5 min", c: "yellow" },
-  { p: "Z3R0COOL", g: "Invasores", s: 54190, t: "hace 8 min", c: "green" },
+  { p: "NEONFOX", g: "Apila", s: 184220, t: "hace 2 min", c: "magenta" },
   { p: "VAULT_07", g: "Rocas", s: 41200, t: "hace 12 min", c: "cyan" },
   { p: "GLITCHA", g: "Bloque Buster", s: 28450, t: "hace 18 min", c: "cyan" },
   { p: "ARKADYA", g: "Serpentina", s: 7820, t: "hace 24 min", c: "green" },
-  { p: "CYBER_LU", g: "Ranaria", s: 18900, t: "hace 31 min", c: "yellow" },
 ];
 
 const TOP_PLAYERS: TopPlayer[] = [
@@ -65,10 +91,10 @@ export default function Home() {
           </p>
           <div className="home-ctas">
             <Link href="/games" className="btn xl pulse">
-              ▶  EXPLORAR JUEGOS
+              ▶ EXPLORAR JUEGOS
             </Link>
             <Link href="/login" className="btn xl magenta">
-              ✦  CREAR CUENTA
+              ✦ CREAR CUENTA
             </Link>
           </div>
           <div className="hero-scroll" aria-hidden="true">
@@ -87,7 +113,11 @@ export default function Home() {
         </div>
         <div className="feature-grid">
           {FEATURES.map((f, i) => (
-            <div key={f.icon} className={"feature-card " + f.color} style={{ transitionDelay: i * 80 + "ms" }}>
+            <div
+              key={f.icon}
+              className={"feature-card " + f.color}
+              style={{ transitionDelay: i * 80 + "ms" }}
+            >
               <FeatureIcon kind={f.icon} />
               <div className="ft-title pixel">{f.title}</div>
               <div className="ft-desc">{f.desc}</div>
@@ -127,7 +157,11 @@ export default function Home() {
       <section className="home-stats reveal">
         <div className="stats-inner">
           {STATS.map((st, i) => (
-            <div key={st.u} className="stat-block" style={{ transitionDelay: i * 90 + "ms" }}>
+            <div
+              key={st.u}
+              className="stat-block"
+              style={{ transitionDelay: i * 90 + "ms" }}
+            >
               <div className="stat-n neon-yellow">{st.n}</div>
               <div className="stat-u pixel">{st.u}</div>
               <div className="stat-s">{st.s}</div>
@@ -150,7 +184,11 @@ export default function Home() {
             </div>
             <div className="ticker">
               {TICKS.map((r, i) => (
-                <div key={r.p + r.g} className="tick-row" style={{ animationDelay: i * 60 + "ms" }}>
+                <div
+                  key={r.p + r.g}
+                  className="tick-row"
+                  style={{ animationDelay: i * 60 + "ms" }}
+                >
                   <span className={"tk-p neon-" + r.c}>{r.p}</span>
                   <span className="tk-mid">▸ {r.g}</span>
                   <span className="tk-s">+{r.s.toLocaleString("es-ES")}</span>
@@ -162,7 +200,9 @@ export default function Home() {
 
           <div className="activity-card">
             <div className="ac-head">
-              <div className="ac-title pixel neon-magenta">▸ TOP JUGADORES · HOY</div>
+              <div className="ac-title pixel neon-magenta">
+                ▸ TOP JUGADORES · HOY
+              </div>
               <Link href="/hall-of-fame" className="lb-link">
                 VER SALÓN →
               </Link>
@@ -172,7 +212,10 @@ export default function Home() {
                 <div key={r.r} className={"top-row" + (TOP_CLASS[i] ?? "")}>
                   <span className="tp-rk">#{String(r.r).padStart(2, "0")}</span>
                   <span className="tp-bar">
-                    <span className="tp-fill" style={{ width: 100 - i * 16 + "%" }}></span>
+                    <span
+                      className="tp-fill"
+                      style={{ width: 100 - i * 16 + "%" }}
+                    ></span>
                   </span>
                   <span className="tp-p">{r.p}</span>
                   <span className="tp-s">{r.s.toLocaleString("es-ES")}</span>
@@ -222,21 +265,23 @@ export default function Home() {
             <div className="faq-item">
               <div className="faq-q pixel">¿REALMENTE ES GRATIS?</div>
               <div className="faq-a">
-                Sí. Arcade Vault es un proyecto sin fines de lucro hecho por amor a los clásicos. No hay versión
-                &quot;premium&quot; escondida.
+                Sí. Arcade Vault es un proyecto sin fines de lucro hecho por
+                amor a los clásicos. No hay versión &quot;premium&quot;
+                escondida.
               </div>
             </div>
             <div className="faq-item">
               <div className="faq-q pixel">¿NECESITO CREAR CUENTA?</div>
               <div className="faq-a">
-                No. Puedes jugar como invitado. Si quieres guardar tu puntuación y aparecer en el ranking, regístrate
-                en 10 segundos.
+                No. Puedes jugar como invitado. Si quieres guardar tu puntuación
+                y aparecer en el ranking, regístrate en 10 segundos.
               </div>
             </div>
             <div className="faq-item">
               <div className="faq-q pixel">¿CÓMO SOBREVIVEN SIN COBRAR?</div>
               <div className="faq-a">
-                Es un proyecto comunitario. Si te gusta, compártelo. Esa es toda la moneda que aceptamos.
+                Es un proyecto comunitario. Si te gusta, compártelo. Esa es toda
+                la moneda que aceptamos.
               </div>
             </div>
           </div>
@@ -249,7 +294,9 @@ export default function Home() {
         <Link href="/games" className="btn xl pulse final-cta">
           INSERTAR MONEDA →
         </Link>
-        <div className="final-tag">Gratis. Sin registro obligatorio. Empieza en segundos.</div>
+        <div className="final-tag">
+          Gratis. Sin registro obligatorio. Empieza en segundos.
+        </div>
       </section>
     </div>
   );
