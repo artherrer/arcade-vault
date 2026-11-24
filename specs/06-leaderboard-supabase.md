@@ -1,6 +1,6 @@
 # SPEC 06 — Leaderboard en Supabase para juegos conectados (ROCAS primero)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02, SPEC 04, SPEC 05
 > **Fecha:** 2026-11-23
 > **Objetivo:** Guardar en Supabase las puntuaciones de los juegos conectados (hoy solo ROCAS) y mostrarlas en el detalle, el Salón de la Fama y la biblioteca, de forma que conectar otro juego sea añadir una fila en `games` y sus reglas de validación.
