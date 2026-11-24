@@ -1,6 +1,6 @@
 # SPEC 07 — APILA jugable: port del Tetris de referencia conectado al leaderboard
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 05, SPEC 06
 > **Fecha:** 2026-11-23
 > **Objetivo:** Convertir `/games/apila/play` en el Tetris de `references/started-games/03-tetris/`, portado a TypeScript dentro de `GamePlayer` y guardando sus puntuaciones en Supabase.

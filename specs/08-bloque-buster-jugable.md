@@ -1,6 +1,6 @@
 # SPEC 08 — BLOQUE BUSTER jugable: port del Arkanoid de referencia conectado al leaderboard
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 05, SPEC 06, SPEC 07
 > **Fecha:** 2026-11-23
 > **Objetivo:** Convertir `/games/bloque-buster/play` en el Arkanoid de `references/started-games/04-arkanoid/`, portado a TypeScript dentro de `GamePlayer` y guardando sus puntuaciones en Supabase.
