@@ -12,7 +12,8 @@ const BUTTON_ACCENT: Record<Game["color"], string> = {
   yellow: " yellow",
 };
 
-export function GameCard({ game }: { game: Game }) {
+// best: mejor puntuación a mostrar; null = juego conectado todavía cargando ("—").
+export function GameCard({ game, best }: { game: Game; best: number | null }) {
   const router = useRouter();
   const tiltRef = useRef<HTMLDivElement>(null);
   const href = `/games/${game.id}`;
@@ -41,7 +42,7 @@ export function GameCard({ game }: { game: Game }) {
         <div className="row">
           <div className="score-badge">
             <span>MEJOR PUNTUACIÓN</span>
-            <b>{game.best.toLocaleString("es-ES")}</b>
+            <b>{best === null ? "—" : best.toLocaleString("es-ES")}</b>
           </div>
           <Link href={href} className={"btn" + BUTTON_ACCENT[game.color]} onClick={(e) => e.stopPropagation()}>
             JUGAR

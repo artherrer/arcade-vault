@@ -5,6 +5,7 @@ import {
   createAsteroidsGame,
   type AsteroidsGame,
   type AsteroidsPhase,
+  type AsteroidsResult,
   type AsteroidsStats,
 } from "@/lib/asteroids/engine";
 
@@ -12,7 +13,7 @@ type AsteroidsCanvasProps = {
   paused: boolean;
   over: boolean;
   onStats: (stats: AsteroidsStats) => void;
-  onGameOver: (score: number) => void;
+  onGameOver: (result: AsteroidsResult) => void;
 };
 
 const CONTROLS: { keys: string[]; action: string }[] = [
@@ -43,7 +44,7 @@ export function AsteroidsCanvas({
     if (!canvas) return;
     const game = createAsteroidsGame(canvas, {
       onStats: (stats) => callbacksRef.current.onStats(stats),
-      onGameOver: (score) => callbacksRef.current.onGameOver(score),
+      onGameOver: (result) => callbacksRef.current.onGameOver(result),
       onPhase: setPhase,
     });
     gameRef.current = game;

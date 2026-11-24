@@ -10,15 +10,21 @@ export type AsteroidsStats = {
   level: number; // empieza en 1
 };
 
+export type AsteroidsResult = {
+  score: number;
+  level: number;
+  durationMs: number; // tiempo jugado (playing + dead), sin ready ni pausa; entero
+};
+
 export type AsteroidsCallbacks = {
   onStats: (stats: AsteroidsStats) => void; // se llama solo cuando cambia algún valor
   onPhase: (phase: AsteroidsPhase) => void; // ready → playing ⇄ dead → gameover
-  onGameOver: (score: number) => void;
+  onGameOver: (result: AsteroidsResult) => void; // una vez por partida: vidas a 0 o end()
 };
 
 export type AsteroidsGame = {
   setPaused: (paused: boolean) => void;
-  end: () => void; // congela el juego (botón FIN); no llama a onGameOver
+  end: () => void; // congela el juego (botón FIN) y llama a onGameOver si aún no se llamó
   destroy: () => void; // cancela el rAF y quita los listeners de window
 };
 
@@ -376,6 +382,9 @@ export function createAsteroidsGame(
   let deadTimer = 0;
   let powerUpSpawned = false;
   let killsSinceSpawn = 0;
+  // Suma de dt (ya capados) en playing y dead. La pausa no llega a update().
+  let playedSeconds = 0;
+  let reported = false;
 
   let paused = false;
   let ended = false;
@@ -424,6 +433,16 @@ export function createAsteroidsGame(
     callbacks.onStats(emitted);
   };
 
+  const reportGameOver = () => {
+    if (reported) return;
+    reported = true;
+    callbacks.onGameOver({
+      score,
+      level,
+      durationMs: Math.round(playedSeconds * 1000),
+    });
+  };
+
   const spawnAsteroids = (count: number) => {
     for (let i = 0; i < count; i++) {
       let x: number, y: number;
@@ -456,7 +475,7 @@ export function createAsteroidsGame(
     lives--;
     if (lives <= 0) {
       setPhase("gameover");
-      callbacks.onGameOver(score);
+      reportGameOver();
     } else {
       deadTimer = DEAD_TIME;
       setPhase("dead");
@@ -469,6 +488,8 @@ export function createAsteroidsGame(
   };
 
   const update = (dt: number) => {
+    if (phase === "playing" || phase === "dead") playedSeconds += dt;
+
     if (phase === "ready") {
       // El campo se mueve, pero la nave no responde y no hay colisiones.
       asteroids.forEach((a) => a.update(dt));
@@ -603,6 +624,7 @@ export function createAsteroidsGame(
     end() {
       ended = true;
       clearKeys();
+      reportGameOver();
     },
     destroy() {
       cancelAnimationFrame(rafId);
