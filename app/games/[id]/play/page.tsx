@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { GamePlayer } from "@/components/game-player";
 import { getCurrentProfile } from "@/lib/auth";
 import { GAMES, getGame } from "@/lib/games";
-import { isConnected } from "@/lib/scoring";
 
 export function generateStaticParams() {
   return GAMES.map((g) => ({ id: g.id }));
@@ -37,11 +36,5 @@ async function GamePlay({
 
   const profile = await getCurrentProfile();
 
-  return (
-    <GamePlayer
-      game={game}
-      username={profile?.username ?? null}
-      connected={isConnected(game.id)}
-    />
-  );
+  return <GamePlayer game={game} username={profile?.username ?? null} />;
 }

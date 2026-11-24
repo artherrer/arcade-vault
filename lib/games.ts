@@ -1,6 +1,7 @@
-// Datos mock de Arcade Vault (portados de references/resources/templates/data.jsx).
+// Catálogo visual de Arcade Vault. Solo juegos reales: cada id tiene arena en
+// components/arenas.ts, regla en SCORE_RULES y fila en public.games.
 
-export type Category = "ARCADE" | "PUZZLE" | "SHOOTER" | "VERSUS";
+export type Category = "ARCADE" | "PUZZLE" | "SHOOTER";
 export type CategoryFilter = "TODOS" | Category;
 export type AccentColor = "cyan" | "magenta" | "yellow" | "green";
 
@@ -12,11 +13,14 @@ export type Game = {
   cat: Category;
   cover: string;
   color: AccentColor;
-  best: number;
-  plays: string;
 };
 
-export type ScoreRow = { rank: number; name: string; score: number; date: string };
+export type ScoreRow = {
+  rank: number;
+  name: string;
+  score: number;
+  date: string;
+};
 
 export const GAMES: Game[] = [
   {
@@ -27,19 +31,15 @@ export const GAMES: Game[] = [
     cat: "ARCADE",
     cover: "cover-bricks",
     color: "cyan",
-    best: 28450,
-    plays: "12.4K",
   },
   {
     id: "apila",
     title: "APILA",
     short: "Encaja las piezas y no dejes que la torre toque el techo.",
-    long: "Ocho piezas de neón caen sin pausa, entre ellas la temida tuerca. Muévelas, gíralas y completa filas para borrarlas. Cada 10 líneas sube el nivel y la caída se acelera.",
+    long: "Siete piezas de neón caen sin pausa. Muévelas, gíralas y completa filas para borrarlas. Cada 10 líneas sube el nivel y la caída se acelera.",
     cat: "PUZZLE",
     cover: "cover-tetro",
     color: "magenta",
-    best: 184220,
-    plays: "31.8K",
   },
   {
     id: "serpentina",
@@ -49,30 +49,6 @@ export const GAMES: Game[] = [
     cat: "ARCADE",
     cover: "cover-snake",
     color: "green",
-    best: 7820,
-    plays: "9.1K",
-  },
-  {
-    id: "gloton",
-    title: "GLOTÓN",
-    short: "Devora puntos y escapa de los fantasmas.",
-    long: "Un círculo glotón patrulla un laberinto coleccionando puntos luminosos. Cuatro espectros lo persiguen, pero cada cierto tiempo aparece una píldora que invierte los papeles.",
-    cat: "ARCADE",
-    cover: "cover-glot",
-    color: "yellow",
-    best: 96400,
-    plays: "27.2K",
-  },
-  {
-    id: "invasores",
-    title: "INVASORES",
-    short: "Defiende el planeta de filas alienígenas.",
-    long: "Olas de pixeles hostiles descienden formación tras formación. Mueve tu cañón en horizontal y abre fuego con precisión, antes de que toquen la superficie.",
-    cat: "SHOOTER",
-    cover: "cover-invaders",
-    color: "green",
-    best: 54190,
-    plays: "18.0K",
   },
   {
     id: "rocas",
@@ -82,62 +58,16 @@ export const GAMES: Game[] = [
     cat: "SHOOTER",
     cover: "cover-rocas",
     color: "yellow",
-    best: 41200,
-    plays: "15.6K",
-  },
-  {
-    id: "ranaria",
-    title: "RANARIA",
-    short: "Cruza la autopista de pixeles.",
-    long: "Salta entre carriles de coches a toda velocidad y troncos a la deriva en el río. Llega a los nenúfares antes de que se acabe el tiempo.",
-    cat: "ARCADE",
-    cover: "cover-rana",
-    color: "green",
-    best: 18900,
-    plays: "6.4K",
-  },
-  {
-    id: "duelo-pixel",
-    title: "DUELO PIXEL",
-    short: "Dos paletas. Una pelota. Reflejos máximos.",
-    long: "El duelo más puro: dos paletas verticales se enfrentan por rebotar una pelota luminosa. Modo solitario contra la CPU o partida local a dos jugadores.",
-    cat: "VERSUS",
-    cover: "cover-duelo",
-    color: "cyan",
-    best: 24,
-    plays: "4.2K",
   },
 ];
 
-export const CATEGORIES: CategoryFilter[] = ["TODOS", "ARCADE", "PUZZLE", "SHOOTER", "VERSUS"];
-
-const PLAYERS = [
-  "PX_KAI", "NEONFOX", "Z3R0COOL", "M00NRYU", "VAULT_07", "GLITCHA",
-  "ATARI_KID", "CYBER_LU", "MAGENTA88", "SCANLINE", "BIT_LORD", "ARKADYA",
-  "DROID_X", "RGB_QUEEN", "PIXEL_DAD", "RETROVIRA", "VECTORX", "JOY_STK",
+export const CATEGORIES: CategoryFilter[] = [
+  "TODOS",
+  "ARCADE",
+  "PUZZLE",
+  "SHOOTER",
 ];
 
 export function getGame(id: string): Game | undefined {
   return GAMES.find((g) => g.id === id);
-}
-
-/** Leaderboard mock determinista: la misma semilla produce siempre las mismas filas. */
-export function seededScores(seed: number, count = 12): ScoreRow[] {
-  let s = seed;
-  const rand = () => (s = (s * 9301 + 49297) % 233280) / 233280;
-  const used = new Set<string>();
-  const rows: ScoreRow[] = [];
-  for (let i = 0; i < count; i++) {
-    let name: string;
-    do {
-      name = PLAYERS[Math.floor(rand() * PLAYERS.length)];
-    } while (used.has(name) && used.size < PLAYERS.length);
-    used.add(name);
-    const base = Math.floor(50000 + rand() * 250000);
-    const score = base - i * Math.floor(2000 + rand() * 4000);
-    const day = String(1 + Math.floor(rand() * 28)).padStart(2, "0");
-    const mon = String(1 + Math.floor(rand() * 12)).padStart(2, "0");
-    rows.push({ rank: i + 1, name, score: Math.max(score, 1000), date: `${day}/${mon}/2026` });
-  }
-  return rows.sort((a, b) => b.score - a.score).map((r, i) => ({ ...r, rank: i + 1 }));
 }
