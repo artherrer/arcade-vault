@@ -2,12 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AsteroidsCanvas } from "@/components/asteroids-canvas";
+import type { AsteroidsStats } from "@/lib/asteroids/engine";
 import type { Game } from "@/lib/games";
 
-// Simulación visual: no hay juego real, la puntuación sube sola.
+// ROCAS es el único juego real (SPEC 05). El resto sigue con la simulación visual:
+// la puntuación sube sola.
 const TICK_MS = 220;
-const LIVES = 3;
-const INITIAL = { score: 0, level: 1 };
+const INITIAL: AsteroidsStats = { score: 0, lives: 3, level: 1 };
+
+function isTextField(target: EventTarget | null) {
+  return target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
+}
 
 export function GamePlayer({ game }: { game: Game }) {
   const [progress, setProgress] = useState(INITIAL);
@@ -15,24 +21,54 @@ export function GamePlayer({ game }: { game: Game }) {
   const [over, setOver] = useState(false);
   const [name, setName] = useState("INVITADO");
   const [saved, setSaved] = useState(false);
-  const { score, level } = progress;
+  // Cambiar la key remonta AsteroidsCanvas: partida nueva en fase "ready".
+  const [run, setRun] = useState(0);
+  const { score, lives, level } = progress;
+  const isRocas = game.id === "rocas";
 
   useEffect(() => {
-    if (over || paused) return;
+    if (isRocas || over || paused) return;
     const t = setInterval(() => {
       setProgress((p) => {
         const next = p.score + Math.floor(10 + Math.random() * 90);
-        return { score: next, level: next % 2500 < 100 ? p.level + 1 : p.level };
+        return { ...p, score: next, level: next % 2500 < 100 ? p.level + 1 : p.level };
       });
     }, TICK_MS);
     return () => clearInterval(t);
-  }, [over, paused]);
+  }, [isRocas, over, paused]);
+
+  // P / Escape = botón PAUSA. Sin efecto con el modal abierto o escribiendo en un campo.
+  useEffect(() => {
+    if (over) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat || isTextField(e.target)) return;
+      if (e.code === "KeyP" || e.key === "Escape") setPaused((p) => !p);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [over]);
+
+  // Pestaña oculta → pausa. Al volver no se reanuda sola.
+  useEffect(() => {
+    if (over) return;
+    const onVisibility = () => {
+      if (document.hidden) setPaused(true);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [over]);
+
+  const endGame = (finalScore: number) => {
+    setProgress((p) => ({ ...p, score: finalScore }));
+    setOver(true);
+  };
 
   const restart = () => {
     setProgress(INITIAL);
     setPaused(false);
     setOver(false);
     setSaved(false);
+    setRun((r) => r + 1);
   };
 
   return (
@@ -49,7 +85,7 @@ export function GamePlayer({ game }: { game: Game }) {
           </div>
           <div className="hud-stat lives">
             <div className="l">Vidas</div>
-            <div className="v">{"♥ ".repeat(LIVES).trim()}</div>
+            <div className="v">{"♥ ".repeat(lives).trim() || "—"}</div>
           </div>
           <div className="hud-stat level">
             <div className="l">Nivel</div>
@@ -71,13 +107,17 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          <div className="game-arena" aria-hidden="true">
-            <div className="grid-floor"></div>
-            <div className="enemy e1"></div>
-            <div className="enemy e2"></div>
-            <div className="enemy e3"></div>
-            <div className="player-ship"></div>
-          </div>
+          {isRocas ? (
+            <AsteroidsCanvas key={run} paused={paused} over={over} onStats={setProgress} onGameOver={endGame} />
+          ) : (
+            <div className="game-arena" aria-hidden="true">
+              <div className="grid-floor"></div>
+              <div className="enemy e1"></div>
+              <div className="enemy e2"></div>
+              <div className="enemy e3"></div>
+              <div className="player-ship"></div>
+            </div>
+          )}
           {paused && (
             <div className="crt-content z-[5] bg-black/60">
               <div>
